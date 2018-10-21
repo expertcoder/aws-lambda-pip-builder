@@ -1,0 +1,62 @@
+service: pip-for-lambda
+
+
+provider:
+  name: aws
+  runtime: python3.6
+  timeout: 30
+  memorySize: 1024
+  environment:
+    TARGET_BUCKET: { Ref: 'PipBuildBucket' }
+  stage: dev
+  region: us-east-1
+
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:PutObject*"
+      Resource:
+        Fn::Join:
+          - ""
+          - - "arn:aws:s3:::"
+            - Ref: PipBuildBucket
+
+
+# you can add packaging information here
+#package:
+#  include:
+#    - ../common/**
+
+#####################################
+# Lambda Functions                  #
+#####################################
+functions:
+  # This function will be invoked on new s3 asset uploads and is intended to generate a
+  # thumb as quickly as possible
+  build_pip:
+    handler: lambda_handler.build_pip_handler
+    events:
+      - http:
+          path: build-pip
+          method: post
+          private: false  # WARNING! public endpoint
+          cors: true
+
+#####################################
+# CloudFormation resource templates #
+#####################################
+resources:
+  Resources:
+    PipBuildBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        LifecycleConfiguration:
+          Rules:
+            -
+              Id: DeleteOldObjects
+              Status: Enabled
+              ExpirationInDays: 1
+              AbortIncompleteMultipartUpload:
+                DaysAfterInitiation: 1
+
+

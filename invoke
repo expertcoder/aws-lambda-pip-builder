@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source variables.sh
+
+aws lambda invoke --function-name pip-for-lambda-dev-build_pip outfile.txt

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+source variables.sh
+
+export SLS_DEBUG=*
+
+sls deploy
