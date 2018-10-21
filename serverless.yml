@@ -14,12 +14,15 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
+        - "s3:GetObject*"
         - "s3:PutObject*"
       Resource:
-        Fn::Join:
-          - ""
-          - - "arn:aws:s3:::"
-            - Ref: PipBuildBucket
+        -
+          Fn::Join:
+            - ""
+            - - "arn:aws:s3:::"
+              - Ref: PipBuildBucket
+              - "/*"
 
 
 # you can add packaging information here
